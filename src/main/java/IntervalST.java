@@ -1,9 +1,10 @@
 import edu.princeton.cs.algs4.BST;
+import edu.princeton.cs.algs4.Queue;
 import edu.princeton.cs.algs4.StdOut;
 
 public class IntervalST<Key extends Comparable<Key>, Value> extends BST {
     Node root;
-
+Queue<Value> q = new Queue<>();
     private class Node {
         Key lo;
         Key hi;
@@ -61,6 +62,21 @@ public class IntervalST<Key extends Comparable<Key>, Value> extends BST {
     private int size(Node x) {
         if (x == null) return 0;
         else return x.size;
+    }
+
+    Iterable<Value> intersects(Key low, Key high) {
+        return intersects(root, low, high);
+    }
+
+    Iterable<Value> intersects(Node h, Key low, Key high) {
+        if (h.maximum.compareTo(low)<0) intersects(h.right,low, high);
+        else if (h.left==null) intersects(h.right,low,high);
+        else  if ((h.lo.compareTo(low)<0 && h.hi.compareTo(low)<0) || (h.hi.compareTo(high)>0 && h.lo.compareTo(high)>0))
+            return null;
+        else {
+            q.enqueue(h.val);
+        }
+        return q;
     }
 
     public static void main(String[] args) {
