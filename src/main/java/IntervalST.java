@@ -66,26 +66,28 @@ public class IntervalST<Key extends Comparable<Key>, Value> extends BST {
     }
 
     Iterable<Value> intersects(Key low, Key high) {
-        return intersects(root, low, high);
+        intersects(root, low, high);
+        return q;
     }
 
-    Iterable<Value> intersects(Node h, Key low, Key high) {
+    private Node intersects(Node h, Key low, Key high) {
         while (h != null) {
-            if (((h.lo.compareTo(low) < 0 && (h.hi.compareTo(low) > 0))) || ((h.hi.compareTo(high) > 0 && h.lo.compareTo(low) > 0))
-                    || ((h.lo.compareTo(low) > 0) && (h.hi.compareTo(high) < 0)) || ((h.lo.compareTo(low) < 0) &&
-                    (h.hi.compareTo(low) > 0))) q.enqueue(h.val);
+            if (((h.lo.compareTo(low) <= 0 && (h.hi.compareTo(low) >= 0))) ||
+                    ((h.hi.compareTo(high) >= 0 && h.lo.compareTo(low) >= 0)) ||
+                    ((h.lo.compareTo(low) >= 0) && (h.hi.compareTo(high) <= 0)) || ((h.lo.compareTo(low) <= 0) &&
+                    (h.hi.compareTo(high) >= 0))) q.enqueue(h.val);
             if (h.left == null) {
-                h = h.right;
-                intersects(h, low, high);
+                h.right = intersects(h.right, low, high);
+                return h.right;
             }
             if (h.left.maximum.compareTo(low) < 0) {
-                h = h.right;
-                intersects(h, low, high);
+                h.right = intersects(h.right, low, high);
+                return h.right;
             }
-            h = h.left;
-            intersects(h, low, high);
+            h.left=intersects(h.left, low, high);
+            h.right=intersects(h.right,low,high);
         }
-        return q;
+        return h;
     }
 
     public static void main(String[] args) {
