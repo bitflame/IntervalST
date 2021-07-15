@@ -4,7 +4,8 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class IntervalST<Key extends Comparable<Key>, Value> extends BST {
     Node root;
-Queue<Value> q = new Queue<>();
+    Queue<Value> q = new Queue<>();
+
     private class Node {
         Key lo;
         Key hi;
@@ -69,12 +70,20 @@ Queue<Value> q = new Queue<>();
     }
 
     Iterable<Value> intersects(Node h, Key low, Key high) {
-        if (h.maximum.compareTo(low)<0) intersects(h.right,low, high);
-        else if (h.left==null) intersects(h.right,low,high);
-        else  if ((h.lo.compareTo(low)<0 && h.hi.compareTo(low)<0) || (h.hi.compareTo(high)>0 && h.lo.compareTo(high)>0))
-            return null;
-        else {
-            q.enqueue(h.val);
+        while (h != null) {
+            if (((h.lo.compareTo(low) < 0 && (h.hi.compareTo(low) > 0))) || ((h.hi.compareTo(high) > 0 && h.lo.compareTo(low) > 0))
+                    || ((h.lo.compareTo(low) > 0) && (h.hi.compareTo(high) < 0)) || ((h.lo.compareTo(low) < 0) &&
+                    (h.hi.compareTo(low) > 0))) q.enqueue(h.val);
+            if (h.left == null) {
+                h = h.right;
+                intersects(h, low, high);
+            }
+            if (h.left.maximum.compareTo(low) < 0) {
+                h = h.right;
+                intersects(h, low, high);
+            }
+            h = h.left;
+            intersects(h, low, high);
         }
         return q;
     }
